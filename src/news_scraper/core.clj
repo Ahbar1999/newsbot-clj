@@ -13,22 +13,16 @@
     (html/html-resource (java.net.URL. url)))
   ; print the data structure containing scraped html 
   ; (clojure.pprint/pprint page)  
-  ; (clojure.pprint/pprint (map html/text (html/select (fetch-url news-page-url)  [:div.row-story-meta]))) 
   
-  ; TRY TO MAKE PAIRS FOR HEADLINE AND DESCRIPTION 
-  ; WE NEED A WAY TO GROUP TOGETHER SELECTED ELEMENTS THAT COME UNDER SAME div 
-  ; (pprint (map html/text (html/select (fetch-url news-page-url)  [(html/attr= :itemprop "headline about")])))
-  
-  (defn get-news-items []
-    ; (map html/text (html/select (fetch-url news-page-url)  [:div.row-story-meta (html/attr= :itemprop "headline about") (html/attr= :itemprop "description")])))
-    ; (map html/text (html/select-nodes* (fetch-url news-page-url)  #{[:div.row-story-meta :> :h1] [:div.row-story-meta :> :h2]})))
-    ; loop over this and retrieve pairs of h1 and(if exists) h2  
+  ; get news items in nested hash map/set datastructure
+  (defn get-news-items [] 
     (html/select-nodes* (fetch-url news-page-url)  [[:div #{:.row-story-meta :> #{:h1 :h2}}]]))
+  
+  ; EXTRACT headlines and descrioptions 
+  ; loop over this and retrieve pairs of h1 and(if exists) h2  
+  (pprint (map (fn [v] [((get v 0) :content) (if (= ((get v 1) :tag) :h2) ((get v 1) :content) "")]) 
+    (map (fn [l] [(nth l 1) (nth l 3)]) 
+               (map (fn [m] (m :content)) (get-news-items)))))
 
-  (pprint (get-news-items))
-  " 
-  (doseq [news-item (get-news-items)]
-    (println news-item "\n")) 
-  " 
   (println "\n"))
 
