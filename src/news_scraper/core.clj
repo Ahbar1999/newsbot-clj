@@ -21,8 +21,10 @@
   
   (defn get-news-items []
     ; (map html/text (html/select (fetch-url news-page-url)  [:div.row-story-meta (html/attr= :itemprop "headline about") (html/attr= :itemprop "description")])))
-    (map html/text (html/select (fetch-url news-page-url)  #{[:div.row-story-meta :> :h1] [:div.row-story-meta :> :h2]})))
- 
+    ; (map html/text (html/select-nodes* (fetch-url news-page-url)  #{[:div.row-story-meta :> :h1] [:div.row-story-meta :> :h2]})))
+    ; loop over this and retrieve pairs of h1 and(if exists) h2  
+    (html/select-nodes* (fetch-url news-page-url)  [[:div #{:.row-story-meta :> #{:h1 :h2}}]]))
+
   (pprint (get-news-items))
   " 
   (doseq [news-item (get-news-items)]
